@@ -89,20 +89,29 @@ class LinkedList {
     //add element in sorted order
     void addOrder(T value) {
         node<T>* newNode = new node<T>(value);
-        std::cout << "Anything";
         if (head == nullptr) {
             head = newNode;
-            std::cout << "Head created";
+            return;
+        } else if (value < head->data) {
+                newNode->next = head;
+                head = newNode;
+                return;
         } else {
-            std::cout << "Entering for loop";
             for (node<T>* cur = head; cur != nullptr; cur = cur->next){
-                if (value >= cur->data && value <= cur->next->data) {
-                    newNode->next = cur->next;
-                    cur->next = newNode;
+                if (value >= cur->data) {
+                    if (cur->next == nullptr) { //at the end of linkedlist
+                        cur->next = newNode;
+                        return;
+                    } else if (value <= cur->next->data) { //not at the end
+                        newNode->next = cur->next;
+                        cur->next = newNode;
+                        return;
+                    }
                 }
             }
         }
     }
+    
 
     // Print the list
     void print() {
