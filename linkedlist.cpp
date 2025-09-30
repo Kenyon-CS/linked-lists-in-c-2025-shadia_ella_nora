@@ -61,6 +61,49 @@ class LinkedList {
         delete nodeToRemove;
     }
 
+    //remove and return first element in list
+    T lfirst() {
+        node<T>* temp = head;
+        head = head->next;
+        T save = temp->data;
+        delete temp;
+        return save;
+    }
+
+    //remove and return last element in list
+    T last() {
+        node<T>* cur = head;
+        node<T>* penult;
+        while (cur->next != nullptr) {
+            if (cur->next->next == nullptr) {
+                penult = cur;
+            }
+            cur = cur->next;
+        }
+        penult->next = nullptr;
+        node<T>* foundLast = cur;
+        delete cur;
+        return foundLast->data;
+    }
+
+    //add element in sorted order
+    void addOrder(T value) {
+        node<T>* newNode = new node<T>(value);
+        std::cout << "Anything";
+        if (head == nullptr) {
+            head = newNode;
+            std::cout << "Head created";
+        } else {
+            std::cout << "Entering for loop";
+            for (node<T>* cur = head; cur != nullptr; cur = cur->next){
+                if (value >= cur->data && value <= cur->next->data) {
+                    newNode->next = cur->next;
+                    cur->next = newNode;
+                }
+            }
+        }
+    }
+
     // Print the list
     void print() {
         node<T>* temp = head;
@@ -88,6 +131,8 @@ int main() {
     list.append(2);
     list.append(3);
     list.prepend(0);
+    list.append(8);
+    list.append(10);
 
     std::cout << "Linked List: ";
     list.print();
@@ -95,6 +140,21 @@ int main() {
     list.remove(2);
     std::cout << "After removing 2: ";
     list.print();
+
+    int x = list.lfirst();
+    std::cout << "Removed head: " << x << std::endl;
+
+    x = list.last();
+    std::cout << "Removed end: " << x << std::endl;
+
+    LinkedList<int> myList;
+    myList.addOrder(40);
+    myList.addOrder(50);
+    myList.addOrder(60);
+    myList.addOrder(30);
+
+    std::cout << "Ordered Linked List: ";
+    myList.print();
 
     return 0;
 }
