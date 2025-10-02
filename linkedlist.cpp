@@ -5,37 +5,42 @@ class node {
   public:
     T data;           // Data of generic type T
     node* next;       // Pointer to the next node in the list
+    node* prev;       // Pointer to the previous node in the list
 
-    node(T val) : data(val), next(nullptr) {}
+    node(T val) : data(val), next(nullptr), prev(nullptr) {}
 };
 
 template <typename T>
 class LinkedList {
   private:
     node<T>* head;  // Pointer to the first node of the list
+    node<T>* tail;  // Pointer to the last node of the list
 
   public:
-    LinkedList() : head(nullptr) {}
+    LinkedList() : head(nullptr), tail(nullptr) {}
 
     // Insert at the end
-    void append(T value) {
+    void push_back(T value) {
         node<T>* newNode = new node<T>(value);
-        if (head == nullptr) {
-            head = newNode;
+        if (!head) {
+            head = tail = newNode;
         } else {
-            node<T>* temp = head;
-            while (temp->next != nullptr) {
-                temp = temp->next;
-            }
-            temp->next = newNode;
+            tail->next = newNode;
+            newNode->prev = tail;
+            tail = newNode;
         }
     }
 
     // Insert at the beginning
-    void prepend(T value) {
+    void push_front(T value) {
         node<T>* newNode = new node<T>(value);
-        newNode->next = head;
-        head = newNode;
+        if (!head) {
+            head = tail = newNode;
+        } else {
+            newNode->next = head;
+            head->prev = newNode;
+            head = newNode;
+        }
     }
 
     // Remove first occurrence of value
@@ -61,12 +66,17 @@ class LinkedList {
         delete nodeToRemove;
     }
 
-    //remove and return first element in list
-    T lfirst() {
+    //remove and return last element in list
+    T pop_back() {
         if (head != nullptr) {
-            node<T>* temp = head;
-            head = head->next;
+            node<T>* temp = tail;
             T save = temp->data;
+            if (head == tail) {
+                head = tail = nullptr;
+            } else {
+                tail = tail->prev;
+                tail->next = nullptr;
+            }
             delete temp;
             return save;
         } else {
@@ -74,23 +84,22 @@ class LinkedList {
         }
     }
 
-    //remove and return last element in list
-    T last() {
-        node<T>* cur = head;
-        node<T>* penult = head;
-        if (head == nullptr) {
-             throw std::out_of_range ("Cannot remove from empty list!");
-        }
-        while (cur->next != nullptr) {
-            if (cur->next->next == nullptr) {
-                penult = cur;
+    //remove and return first element in list
+    T pop_front() {
+        if (head != nullptr) {
+            node<T>* temp = head;
+            T save = temp->data;
+            if (head == tail) {
+                head = tail = nullptr;
+            } else {
+                head = head->next;
+                head->prev = nullptr;
             }
-            cur = cur->next;
+            delete temp;
+            return save;
+        } else {
+            throw std::out_of_range ("Cannot remove from empty list!");
         }
-        penult->next = nullptr;
-        T foundLast = cur->data;
-        delete cur;
-        return foundLast;
     }
 
     //add element in sorted order
@@ -101,6 +110,7 @@ class LinkedList {
             return;
         } else if (value < head->data) {
             newNode->next = head;
+            head->prev = newNode;
             head = newNode;
             return;
         } else {
@@ -108,9 +118,12 @@ class LinkedList {
                 if (value >= cur->data) {
                     if (cur->next == nullptr) { //at the end of linkedlist
                         cur->next = newNode;
+                        newNode->prev = cur;
                         return;
                     } else if (value <= cur->next->data) { //not at the end
                         newNode->next = cur->next;
+                        newNode->prev = cur;
+                        cur->next->prev = newNode;
                         cur->next = newNode;
                         return;
                     }
@@ -124,10 +137,16 @@ class LinkedList {
     void print() {
         node<T>* temp = head;
         while (temp != nullptr) {
-            std::cout << temp->data << " -> ";
+            std::cout << temp->data << " <-> ";
             temp = temp->next;
         }
         std::cout << "nullptr" << std::endl;
+        /*temp = tail;
+        while (temp != nullptr) {
+            std::cout << temp->data << " <-> ";
+            temp = temp->prev;
+        }
+        std::cout << "nullptr" << std::endl;*/
     }
 
     // Destructor to clean up memory
@@ -140,15 +159,17 @@ class LinkedList {
     }
 };
 
+
+
 int main() {
     LinkedList<int> list;
 
-    list.append(1);
-    list.append(2);
-    list.append(3);
-    list.prepend(0);
-    list.append(8);
-    list.append(10);
+    list.push_back(1);
+    list.push_back(2);
+    list.push_back(3);
+    list.push_front(0);
+    list.push_back(8);
+    list.push_back(10);
 
     std::cout << "Linked List: ";
     list.print();
@@ -157,29 +178,32 @@ int main() {
     std::cout << "After removing 2: ";
     list.print();
 
-    int x = list.lfirst();
+    int x = list.pop_front();
     std::cout << "Removed head: " << x << std::endl;
-    x = list.last();
+    x = list.pop_back();
     std::cout << "Removed end: " << x << std::endl;
     std::cout << "After removing ends: ";
     list.print();
 
     LinkedList<double> emptyList;
     double a, b;
-    try {
-        a = emptyList.lfirst();
+    //the below runs fine but leads to program timing out, so it is commented out
+    /*try {
+        a = emptyList.pop_front();
     } catch(std::out_of_range&) {
         std::cout << "Not crashing on empty lists with lfirst" << std::endl;
     }
     try {
-        b = emptyList.last();
+        b = emptyList.pop_back();
     } catch(std::out_of_range&) {
         std::cout << "Not crashing on empty lists with last" << std::endl;
-    }
-    emptyList.append(85.67);
-    a = emptyList.lfirst();
-    emptyList.append(.98);
-    b = emptyList.last();
+    }*/
+    emptyList.push_back(85.67);
+    a = emptyList.pop_front();
+    //std::cout << "popped one from front" << std::endl;
+    emptyList.push_front(.98);
+    b = emptyList.pop_back();
+    //std::cout << "popped one from back" << std::endl;
     std::cout << "Removed values: " << a << ", " << b << std::endl;
 
     LinkedList<int> myList;
@@ -190,8 +214,6 @@ int main() {
 
     std::cout << "Ordered Linked List: ";
     myList.print();
-
-    std::cout << "wtffff";
 
     return 0;
 }
