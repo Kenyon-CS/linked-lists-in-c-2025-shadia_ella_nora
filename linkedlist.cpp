@@ -69,9 +69,9 @@ class LinkedList {
             T save = temp->data;
             delete temp;
             return save;
+        } else {
+            throw std::out_of_range ("Cannot remove from empty list!");
         }
-        T junk;
-        return junk;
     }
 
     //remove and return last element in list
@@ -79,9 +79,7 @@ class LinkedList {
         node<T>* cur = head;
         node<T>* penult = head;
         if (head == nullptr) {
-            T foundLast = head->data;
-            delete head;
-            return foundLast;
+             throw std::out_of_range ("Cannot remove from empty list!");
         }
         while (cur->next != nullptr) {
             if (cur->next->next == nullptr) {
@@ -102,9 +100,9 @@ class LinkedList {
             head = newNode;
             return;
         } else if (value < head->data) {
-                newNode->next = head;
-                head = newNode;
-                return;
+            newNode->next = head;
+            head = newNode;
+            return;
         } else {
             for (node<T>* cur = head; cur != nullptr; cur = cur->next){
                 if (value >= cur->data) {
@@ -161,9 +159,28 @@ int main() {
 
     int x = list.lfirst();
     std::cout << "Removed head: " << x << std::endl;
-
     x = list.last();
     std::cout << "Removed end: " << x << std::endl;
+    std::cout << "After removing ends: ";
+    list.print();
+
+    LinkedList<double> emptyList;
+    double a, b;
+    try {
+        a = emptyList.lfirst();
+    } catch(std::out_of_range&) {
+        std::cout << "Not crashing on empty lists with lfirst" << std::endl;
+    }
+    try {
+        b = emptyList.last();
+    } catch(std::out_of_range&) {
+        std::cout << "Not crashing on empty lists with last" << std::endl;
+    }
+    emptyList.append(85.67);
+    a = emptyList.lfirst();
+    emptyList.append(.98);
+    b = emptyList.last();
+    std::cout << "Removed values: " << a << ", " << b << std::endl;
 
     LinkedList<int> myList;
     myList.addOrder(40);
@@ -173,6 +190,8 @@ int main() {
 
     std::cout << "Ordered Linked List: ";
     myList.print();
+
+    std::cout << "wtffff";
 
     return 0;
 }
