@@ -63,11 +63,15 @@ class LinkedList {
 
     //remove and return first element in list
     T lfirst() {
-        node<T>* temp = head;
-        head = head->next;
-        T save = temp->data;
-        delete temp;
-        return save;
+        if (head != nullptr) {
+            node<T>* temp = head;
+            head = head->next;
+            T save = temp->data;
+            delete temp;
+            return save;
+        }
+        T junk;
+        return junk;
     }
 
     //remove and return last element in list
