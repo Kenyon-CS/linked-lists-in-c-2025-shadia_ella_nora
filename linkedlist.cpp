@@ -77,7 +77,12 @@ class LinkedList {
     //remove and return last element in list
     T last() {
         node<T>* cur = head;
-        node<T>* penult;
+        node<T>* penult = head;
+        if (head == nullptr) {
+            T foundLast = head->data;
+            delete head;
+            return foundLast;
+        }
         while (cur->next != nullptr) {
             if (cur->next->next == nullptr) {
                 penult = cur;
