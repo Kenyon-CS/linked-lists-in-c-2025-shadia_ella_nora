@@ -85,9 +85,9 @@ class LinkedList {
             cur = cur->next;
         }
         penult->next = nullptr;
-        node<T>* foundLast = cur;
+        T foundLast = cur->data;
         delete cur;
-        return foundLast->data;
+        return foundLast;
     }
 
     //add element in sorted order
